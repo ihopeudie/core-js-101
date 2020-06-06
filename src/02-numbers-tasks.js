@@ -11,7 +11,7 @@
 /**
  * Returns an area of a rectangle given by width and heigth.
  *
- * @param {numder} width
+ * @param {number} width
  * @param {number} height
  * @return {number}
  *
@@ -189,10 +189,8 @@ function getParallelipidedDiagonal(a, b, c) {
  *   1678, 3  => 2000
  */
 function roundToPowerOfTen(num, pow) {
-  if (pow === 0) {
-    return num;
-  }
-  return num - (num % (10 ** pow));
+  const powerOfTen = 10 ** pow;
+  return Math.round(num / powerOfTen) * powerOfTen;
 }
 
 /**
@@ -200,7 +198,7 @@ function roundToPowerOfTen(num, pow) {
  * See: https://en.wikipedia.org/wiki/Primality_test
  *
  * @param {number} n
- * @return {bool}
+ * @return {boolean}
  *
  * @example:
  *   4 => false
@@ -212,8 +210,18 @@ function roundToPowerOfTen(num, pow) {
  *   16 => false
  *   17 => true
  */
-function isPrime(/* n */) {
-  throw new Error('Not implemented');
+function isPrime(n) {
+  if (n === 1) {
+    return true;
+  }
+  let i = Math.round(n / 2);
+  while (i > 1) {
+    if (n % i === 0) {
+      return false;
+    }
+    i -= 1;
+  }
+  return true;
 }
 
 /**
@@ -231,8 +239,9 @@ function isPrime(/* n */) {
  *   toNumber(42, 0) => 42
  *   toNumber(new Number(42), 0) => 42
  */
-function toNumber(/* value, def */) {
-  throw new Error('Not implemented');
+function toNumber(value, def) {
+  const num = parseFloat(value ? value.toString() : '');
+  return Number.isNaN(num) ? def : num;
 }
 
 module.exports = {
