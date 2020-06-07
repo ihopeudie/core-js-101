@@ -32,7 +32,7 @@
  * @return {RegExp}
  */
 function getRegexForGuid() {
-  throw new Error('Not implemented');
+  return /{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}/i;
 }
 
 
@@ -54,7 +54,7 @@ function getRegexForGuid() {
  *
  */
 function getRegexForPitSpot() {
-  throw new Error('Not implemented');
+  return /.*p[\w\s]t.*/;
 }
 
 
@@ -68,7 +68,7 @@ function getRegexForPitSpot() {
  *  - Valid passwords will only be alphanumeric characters.
  *
  * @param {number} minLength
- * @return {Regex}
+ * @return {RegExp}
  *
  * @example
  *   let validator = getPasswordValidator(6);
@@ -78,8 +78,8 @@ function getRegexForPitSpot() {
  *   'PASSW0RD'.match(validator)  => false
  *   'Pa55'.match(validator) => false
  */
-function getPasswordValidator(/* minLength */) {
-  throw new Error('Not implemented');
+function getPasswordValidator(minLength) {
+  return new RegExp(`^[A-Z][a-zA-Z0-9]*[a-z]{${minLength - 2},}$|^[a-zA-Z0-9]+[a-z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]{${minLength - 3},}$|^[a-zA-Z0-9]+[A-Z][a-zA-Z0-9]*[a-z][a-zA-Z0-9]{${minLength - 3},}$|^[a-zA-Z0-9]{${minLength - 2},}[a-z][A-Z]$`);
 }
 
 
