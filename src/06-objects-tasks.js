@@ -20,8 +20,12 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  return {
+    width,
+    height,
+    getArea: () => width * height,
+  };
 }
 
 
@@ -35,8 +39,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 
@@ -45,14 +49,17 @@ function getJSON(/* obj */) {
  *
  * @param {Object} proto
  * @param {string} json
- * @return {object}
+ * @return {Object}
  *
  * @example
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  const obj = JSON.parse(json);
+  const values = Object.values(obj);
+
+  return new proto.constructor(...values);
 }
 
 
@@ -110,36 +117,182 @@ function fromJSON(/* proto, json */) {
  *  For more examples see unit tests.
  */
 
+class CssSelector {
+  constructor(obj, currentOrder) {
+    this.config = {
+      element: null,
+      id: null,
+      class: [],
+      attr: [],
+      pseudoClass: [],
+      pseudoElement: null,
+    };
+
+    this.currentOrder = currentOrder;
+
+    Object.entries(obj).forEach(([key, value]) => {
+      if (['class', 'attr', 'pseudoClass'].includes(key)) {
+        this.config[key].push(value);
+      } else {
+        this.config[key] = value;
+      }
+    });
+  }
+
+  element(value) {
+    if (this.config.element) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    const order = 0;
+    if (order < this.currentOrder) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.config.element = value;
+    this.currentOrder = 0;
+    return this;
+  }
+
+  id(value) {
+    if (this.config.id) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+
+    const order = 1;
+    if (order < this.currentOrder) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.config.id = value;
+    this.currentOrder = 1;
+    return this;
+  }
+
+  class(value) {
+    const order = 2;
+    if (order < this.currentOrder) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.config.class.push(value);
+    this.currentOrder = 2;
+    return this;
+  }
+
+  attr(value) {
+    const order = 3;
+    if (order < this.currentOrder) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.config.attr.push(value);
+    this.currentOrder = 3;
+    return this;
+  }
+
+  pseudoClass(value) {
+    const order = 4;
+    if (order < this.currentOrder) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.config.pseudoClass.push(value);
+    this.currentOrder = 4;
+    return this;
+  }
+
+  pseudoElement(value) {
+    if (this.config.pseudoElement) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    const order = 5;
+    if (order < this.currentOrder) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.config.pseudoElement = value;
+    this.currentOrder = 5;
+    return this;
+  }
+
+  stringify() {
+    let result = '';
+
+    if (this.config.element) {
+      result += this.config.element;
+    }
+
+    if (this.config.id) {
+      result += `#${this.config.id}`;
+    }
+
+    if (this.config.class.length !== 0) {
+      this.config.class.forEach(((cssCl) => {
+        result += `.${cssCl}`;
+        return true;
+      }));
+    }
+
+    if (this.config.attr.length !== 0) {
+      this.config.attr.forEach(((att) => {
+        result += `[${att}]`;
+        return true;
+      }));
+    }
+
+    if (this.config.pseudoClass.length !== 0) {
+      this.config.pseudoClass.forEach(((pseudoCl) => {
+        result += `:${pseudoCl}`;
+        return true;
+      }));
+    }
+
+    if (this.config.pseudoElement) {
+      result += `::${this.config.pseudoElement}`;
+    }
+    return result;
+  }
+}
+
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  res: [],
+
+  element(value) {
+    return new CssSelector({ element: value }, 0);
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return new CssSelector({ id: value }, 1);
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return new CssSelector({ class: value }, 2);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return new CssSelector({ attr: value }, 3);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return new CssSelector({ pseudoClass: value }, 4);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    return new CssSelector({ pseudoElement: value }, 5);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    let result = '';
+    result += selector1.stringify();
+    result += ` ${combinator} `;
+    result += selector2.stringify();
+
+    this.res.push(result);
+    return this;
+  },
+
+  stringify() {
+    let result = '';
+    while (this.res.length > 0) {
+      result += this.res.pop();
+    }
+    return result;
   },
 };
-
 
 module.exports = {
   Rectangle,
