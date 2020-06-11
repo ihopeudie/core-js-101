@@ -199,6 +199,7 @@ function partialUsingArguments(fn, ...args1) {
  *   getId4() => 7
  *   getId10() => 11
  */
+// eslint-disable-next-line func-names
 const getIdGeneratorFunction = (startFrom) => (function (n) {
   let number = n;
   return () => {
