@@ -199,15 +199,18 @@ function partialUsingArguments(fn, ...args1) {
  *   getId4() => 7
  *   getId10() => 11
  */
-// eslint-disable-next-line func-names
-const getIdGeneratorFunction = (startFrom) => (function (n) {
-  let number = n;
-  return () => {
-    number += 1;
-    return number;
+
+const getIdGeneratorFunction = (startFrom) => {
+  const gen = (n) => {
+    let number = n;
+    return () => {
+      number += 1;
+      return number;
+    };
   };
-}(startFrom - 1)
-);
+  return (gen(startFrom - 1));
+};
+
 
 module.exports = {
   getComposition,
